@@ -1,0 +1,63 @@
+using UnityEngine;
+
+public class AdvancedMovementSystem : MonoBehaviour
+{
+    public CharacterController controller;
+    public float walkSpeed = 5f;
+    public float sprintSpeed = 12f;
+    public float glideSpeed = 15f;
+    public float carSpeed = 80f; // سرعة السيارة
+    
+    private bool isGliding = false;
+    private bool isDriving = false;
+    private GameObject currentVehicle;
+
+    void Update()
+    {
+        if (!isDriving)
+        {
+            HandleWalkingAndSprinting();
+            HandleJumpAndGlide();
+        }
+        else
+        {
+            HandleCarDriftingAndNitro();
+        }
+    }
+
+    // نظام المطاردات بين السيارات
+    void HandleCarDriftingAndNitro()
+    {
+        if (Input.GetKey(KeyCode.Space) && currentVehicle != null)
+        {
+            // انجراف (Drift) عصري
+            currentVehicle.GetComponent<Rigidbody>().AddTorque(Vector3.up * 5f, ForceMode.Impulse);
+            
+            // نظام النيترو (للاشتراك الفاخر أو للجميع)
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                currentVehicle.GetComponent<Rigidbody>().velocity += transform.forward * 50f;
+                Debug.Log("نيترو مشتعل!");
+            }
+        }
+    }
+
+    // القفز بالمظلي والتحليق
+    void HandleJumpAndGlide()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && !controller.isGrounded)
+        {
+            isGliding = true;
+            Debug.Log("تم تفعيل وضع الطيران الشراعي (Wingsuit)!");
+        }
+
+        if (isGliding)
+        {
+            // حركة انسيابية سريعة تشبه الأكشن
+            Vector3 glideDirection = transform.forward * glideSpeed + Vector3.down * 2f; // هبوط تدريجي
+            controller.Move(glideDirection * Time.deltaTime);
+            
+            // يمكنك التصويب وإطلاق النار أثناء الطيران
+        }
+    }
+}
