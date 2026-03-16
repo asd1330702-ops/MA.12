@@ -1,0 +1,58 @@
+// نظام إدارة الاشتراكات الفاخرة
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+// نفترض استخدام Photon أو Mirror للشبكات
+
+[System.Serializable]
+public class PremiumSubscription
+{
+    public string playerID;
+    public bool isSubscribed;
+    public DateTime subscriptionEndDate;
+    public SubscriptionTier tier; // فضي، ذهبي، ماسي مثلاً
+
+    // مزايا حصرية ولكنها تجميلية/ترفيهية فقط
+    public List<string> exclusiveSkins = new List<string>() { 
+        "بدلة ذهبية ماسية", 
+        "جلد سلاح بلازمي فاخر", 
+        "أثر طيران نادر (آثار نيزكية)" 
+    };
+    public bool accessToPrivateVoiceChannels = true; // دردشة صوتية خاصة VIP
+    public bool doubleXPBonus = true; // مضاعفة نقاط الخبرة (تجميلية بحتة)
+    public int monthlyDiamonds = 1500; // عملة بريميوم مجانية كل شهر
+
+    public enum SubscriptionTier
+    {
+        Free,
+        Premium,
+        Elite // فئة افخم مع هدايا شهرية حقيقية
+    }
+
+    public void CheckSubscriptionStatus()
+    {
+        if (DateTime.Now > subscriptionEndDate)
+            isSubscribed = false;
+    }
+
+    // ربط مع منصة الدفع (Stripe/Apple Pay/Google Pay)
+    public void ActivateSubscription(string playerEmail, SubscriptionTier selectedTier)
+    {
+        // كود التواصل مع API للدفع
+        Debug.Log($"تم تفعيل الاشتراك الفاخر للحساب: {playerEmail} لمدة 30 يوماً");
+        this.isSubscribed = true;
+        this.tier = selectedTier;
+        this.subscriptionEndDate = DateTime.Now.AddMonths(1);
+        
+        // منح الهدايا الشهرية
+        GrantMonthlyRewards();
+    }
+
+    void GrantMonthlyRewards()
+    {
+        if (tier == SubscriptionTier.Elite)
+        {
+            Debug.Log("تم ايداع 1500 ماسة في محفظتك!");
+        }
+    }
+}
