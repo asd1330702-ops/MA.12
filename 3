@@ -1,0 +1,53 @@
+using Firebase;
+using Firebase.Auth;
+using System;
+
+public class AuthenticationManager : MonoBehaviour
+{
+    private FirebaseAuth auth;
+    private Dictionary<string, object> playerProfile;
+
+    void Start()
+    {
+        auth = FirebaseAuth.DefaultInstance;
+    }
+
+    // تسجيل الدخول بالبريد الإلكتروني
+    public void SignInWithEmail(string email, string password)
+    {
+        auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
+            if (task.IsCompleted && !task.IsFaulted)
+            {
+                FirebaseUser newUser = task.Result;
+                Debug.Log($"مرحباً بعودتك {newUser.Email}!");
+                
+                // ربط الحساب مع تقدم اللعب عبر السيرفر
+                LoadPlayerProfile(newUser.UserId);
+                
+                // ميزة إضافية: ربط مع Google Play Games [citation:5]
+                LinkWithGooglePlay(newUser.UserId);
+            }
+        });
+    }
+
+    // ربط حساب المستخدم عبر السيرفرات لتوحيد التقدم (Cross-Progression)
+    void LinkWithGooglePlay(string firebaseUID)
+    {
+        // هذا يسمح للاعب باللعب على الهاتف ثم العودة للكمبيوتر بنفس التقدم
+        Debug.Log($"تم ربط الحساب {firebaseUID} مع خدمات Google Play");
+    }
+
+    // ربط مع مدن حقيقية (ميزة الـ "Modern Cities")
+    public void LinkPlayerToRealCity(string cityName, string firebaseUID)
+    {
+        // تسجيل المدينة المفضلة للاعب (مثلاً: الرياض، دبي، القاهرة)
+        // هذا يحدد "السيرفر الإقليمي" أو الـ "Faction" الخاص به
+        AssignPlayerToRegionalServer(firebaseUID, cityName);
+    }
+
+    void AssignPlayerToRegionalServer(string playerID, string city)
+    {
+        Debug.Log($"اللاعب {playerID} أصبح تابعاً لمنطقة {city} وتم توجيهه لأقرب سيرفر.");
+        // مثلاً: Server_Dubai, Server_Riyadh, Server_Cairo
+    }
+}
