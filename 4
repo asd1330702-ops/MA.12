@@ -1,0 +1,36 @@
+using Dissonance; // مثال على استخدام نظام صوتي
+
+public class VoiceChatManager : MonoBehaviour
+{
+    private DissonanceComms voiceComms;
+    public PremiumSubscription playerSubscription; // التحقق من الاشتراك
+
+    void Awake()
+    {
+        voiceComms = FindObjectOfType<DissonanceComms>();
+    }
+
+    // إنشاء غرفة دردشة صوتية خاصة (ميزة حصرية للمشتركين)
+    public void CreatePrivateVoiceChannel(string channelName, string password)
+    {
+        if (playerSubscription.isSubscribed)
+        {
+            voiceComms.Rooms.Join(channelName, password);
+            Debug.Log($"تم إنشاء الغرفة الصوتية الخاصة: {channelName}");
+            
+            // ميزة "افضل": جودة صوت 128kbps بدلاً من 64kbps
+            voiceComms.Quality = AudioQuality.High;
+        }
+        else
+        {
+            Debug.Log("هذه الميزة حصرية للمشتركين فقط.");
+        }
+    }
+
+    // نظام القرب من اللاعبين (Proximity Chat) - صوت اللاعبين يعلو ويخفت حسب المسافة
+    public void EnableProximityChat()
+    {
+        // هذه ميزة رائعة تزيد الواقعية، خصوصاً في المطاردات
+        voiceComms.IsProximityEnabled = true;
+    }
+}
